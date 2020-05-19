@@ -20,7 +20,8 @@ import logging
 import os
 from collections import OrderedDict
 import torch
-
+from detectron2.data import build_detection_test_loader
+from detectron2.config import CfgNode
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.config import get_cfg
@@ -29,9 +30,10 @@ from detectron2.engine import DefaultTrainer, default_argument_parser, default_s
 from detectron2.evaluation import (
     COCOEvaluator,
     verify_results,
+    DatasetEvaluators,
 )
 from detectron2.modeling import GeneralizedRCNNWithTTA
-
+import rgbddetection
 
 class Trainer(DefaultTrainer):
     """
@@ -52,9 +54,16 @@ class Trainer(DefaultTrainer):
         """
         if output_folder is None:
             output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
-        evaluators = [COCOEvaluator(dataset_name, cfg, True, output_folder)]
-        return DatasetEvaluators(evaluator_list)
-
+        print(dataset_name)
+        from detectron2.data import MetadataCatalog
+        print(MetadataCatalog.get(dataset_name))
+        evaluators = [COCOEvaluator(dataset_name, cfg, False, output_folder)]
+        return DatasetEvaluators(evaluators)
+    
+    @classmethod
+    def build_test_loader(cls, cfg: CfgNode, dataset_name):
+        return build_detection_test_loader(cfg, dataset_name)
+            
     @classmethod
     def test_with_TTA(cls, cfg, model):
         logger = logging.getLogger("detectron2.trainer")

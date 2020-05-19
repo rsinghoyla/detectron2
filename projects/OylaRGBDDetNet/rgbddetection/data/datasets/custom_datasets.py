@@ -32,7 +32,7 @@ DATASETS = [
     ),
     DatasetInfo(
         name="balloon_val",
-        images_root="balloon/val/",
+        images_root="balloon/val",
         annotations_fpath="balloon/val/"
     ),
     DatasetInfo(
@@ -172,22 +172,22 @@ def register_dataset(dataset_data: DatasetInfo, datasets_root: Optional[os.PathL
     annotations_fpath = _maybe_prepend_base_path(datasets_root, dataset_data.annotations_fpath)
     images_root = _maybe_prepend_base_path(datasets_root, dataset_data.images_root)
 
-
+    thing_classes = []
     if 'balloon' in dataset_data.name:
-        DatasetCatalog.register(dataset_data.name, get_balloon_dicts(image_root))
+        DatasetCatalog.register(dataset_data.name, lambda ir = images_root :get_balloon_dicts(ir))
         thing_classes =  ["balloon"]
     if 'epfl_relabel_eavise' in dataset_data.name:
         DatasetCatalog.register(dataset_data.name, get_balloon_dicts(annotations_fpath))
         thing_classes = ["person"]
+    print(thing_classes)
     MetadataCatalog.get(dataset_data.name).set(
-        json_file=annotations_fpath,
         image_root=images_root,
         thing_classes = thing_classes
     )
 
 
 def register_datasets(
-    datasets_data: Iterable[CocoDatasetInfo], datasets_root: Optional[os.PathLike] = None
+    datasets_data: Iterable[DatasetInfo], datasets_root: Optional[os.PathLike] = None
 ):
     """
     Registers provided COCO DensePose datasets
