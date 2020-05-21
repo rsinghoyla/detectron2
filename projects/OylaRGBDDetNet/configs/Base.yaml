@@ -1,6 +1,0 @@
-_BASE_: "/code/Work/detectron2/configs/COCO-Detection/retinanet_R_50_FPN_3x.yaml"
-MODEL:
-  ROI_HEADS:
-    NUM_CLASSES: 1
-    BATCH_SIZE_PER_IMAGE: 128
-  MASK_ON: false
